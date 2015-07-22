@@ -53,7 +53,7 @@ MyApp.module('Main', function (Main, MyApp, Backbone, Marionette, $, _){
 
 			countingSite.forEach(function(id) {
 
-				var url = "https://api.eco-counter-tools.com/v1/h7q239dd/counting_site/" + id;
+				var url = "https://api.eco-counter-tools.com/v1/" + "h7q239dd" + "/counting_site/" + id;
 
 				var counter = new Counter();
 
@@ -77,11 +77,20 @@ MyApp.module('Main', function (Main, MyApp, Backbone, Marionette, $, _){
 		showBackground: function(counters) {
 			var map = new Background({collection: counters});
 			Main.root.showChildView('mapCanvas', map);
+		},
+
+		showInfoBox: function(map, counter) {
+			var infoboxItemView = new InfoboxItemView({model: counter, map: map});
+			Main.root.showChildView('chartArea', infoboxItemView);
 		}
 	});
 
 	MyApp.on('start', function() {
 		Main.controller = new Main.Controller();
 		Main.controller.start();
+	});
+
+	MyApp.on('markerClick', function(options){
+		Main.controller.showInfoBox(options[0], options[1]);
 	});
 });

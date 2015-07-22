@@ -7,3 +7,16 @@
 	right: 0; 
 	z-index: 0;
 }
+
+.photo {
+	height: 80px;
+}
+
+#chart-area {
+	z-index: 10;
+	position: relative;
+}
+
+.name {
+	
+}
