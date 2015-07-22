@@ -1,7 +1,7 @@
 [
 		{
 			"name": "Arlington",
-			"counting_site": "[100002185, 100006324]"
+			"counting_site": [100002185, 100006324]
 		},
 		{
 			"name": "Montreal",
