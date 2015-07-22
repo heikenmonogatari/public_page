@@ -2,20 +2,25 @@
 <head>
 	<link rel="stylesheet" href="libraries/bootstrap-datepicker-1.4.0-dist/css/bootstrap-datepicker.css"/>
 	<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 	<link rel="stylesheet" href="css/myStyle.css"/>
 </head>
 <body>
+	<div class="container-fluid">
+		<div id="map-canvas"></div>
+		<div id="chart-area" class="col-lg-3 col-md-3 col-xs-12 col-sm-12"></div>
+	</div>
+	
 
-	<div id="map-canvas"></div>
-	<div id="chart-area"></div>
 
 	<script type="text/template" id="infobox_template">
-		<div class="name"><%- name %></div>
+		<button class="close" type="button">x</button>
+		<div class="infoTitle"><center><%- name %></center></div>
         <div class="chart_container"></div>
 	</script>
 
 	<!-- Libraries -->
-	<script src="libraries/jquery-1.11.1.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="libraries/lodash.min.js"></script>
     <script src="libraries/backbone-min.js"></script>
     <script src="libraries/backbone.marionette.min.js"></script>
@@ -27,6 +32,7 @@
     <script src="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
 	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
 	<script src="http://matchingnotes.com/javascripts/leaflet-google.js"></script>
+	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 
 	<!-- App -->
 	<script src="js/app.js"></script>

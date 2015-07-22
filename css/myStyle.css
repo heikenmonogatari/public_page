@@ -1,3 +1,7 @@
+#chart-area:empty {
+	display: none;
+}
+
 #map-canvas {
 	height: 100%;
 	position: absolute; 
@@ -15,8 +19,26 @@
 #chart-area {
 	z-index: 10;
 	position: relative;
+	float: right;
+	background-color: #282828;
+	border-radius: 4px;
 }
 
-.name {
-	
+.infoTitle {
+	color: white;
+	font-weight: bold;
+	font-size: 150%;
 }
+
+.chart_container {
+	height: 200px;
+}
+
+.container-fluid {
+	height: 100%;
+}
+
+.photoCarousel {
+	height: 150px;
+}
+
