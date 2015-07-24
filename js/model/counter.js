@@ -1,5 +1,5 @@
 // COUNTER MODEL
-Counter = Backbone.Model.extend({});
+Counter = Backbone.Model.extend();
 
 
 // COUNTER COLLECTION

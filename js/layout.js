@@ -4,7 +4,8 @@ MyApp.module('Layout', function (Layout, MyApp, Backbone) {
         el: 'body',
         regions: {
             mapCanvas: "#map-canvas",
-            chartArea: "#chart-area"
+            chartArea: "#chart-area",
+            header: "#header"
         }
     });
 });

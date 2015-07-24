@@ -91,7 +91,7 @@ var InfoboxItemView = Backbone.Marionette.ItemView.extend({
 	
 		$(function() {
 			$("#chart-area").draggable({
-				containment: "parent"
+				containment: "#map-canvas"
 			});
 		});
 
@@ -126,11 +126,11 @@ var InfoboxItemView = Backbone.Marionette.ItemView.extend({
 
 		for (var i=0; i<photos.length; i++) {
 			if (i == 0) {
-				$('.carousel-inner').append('<div class="item active" id="item' + i + '"></div>');
+				$('.carousel-inner').append('<div class="item photoCarouselImg active" id="item' + i + '"></div>');
 			}else{
-				$('.carousel-inner').append('<div class="item" id="item' + i + '"></div>');
+				$('.carousel-inner').append('<div class="item photoCarouselImg" id="item' + i + '"></div>');
 			}
-			$('#item' + i).append('<img class="photoCarousel" src="' + photos[i] + '">');
+			$('#item' + i).append('<center><img class="photoCarousel photoCarouselImg" src="' + photos[i] + '" style="height:250px;"></center>');
 		}
 
 		$('#myCarousel').append('<a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">');
@@ -138,5 +138,9 @@ var InfoboxItemView = Backbone.Marionette.ItemView.extend({
 
 		$('#myCarousel').append('<a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">');
 		$('.right').append('<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span><span class="sr-only">Next</span>');
+
+		$('.carousel').carousel({
+			interval: 4000
+		})
 	}
 });

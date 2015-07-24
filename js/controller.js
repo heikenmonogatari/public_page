@@ -31,11 +31,10 @@ MyApp.module('Main', function (Main, MyApp, Backbone, Marionette, $, _){
 
 			this.domains.fetch({
 				success: function() {
-					console.log(self.domains.toJSON());
 					self.domains.forEach(function(domain) {
 						if (self.domain == domain.get('name')) {
-							console.log(domain.get('name'));
-
+							self.showHeader(domain);
+							self.showLogos(domain);
 							self.getInfo(domain.get('counting_site'));
 						}
 					});
@@ -43,35 +42,64 @@ MyApp.module('Main', function (Main, MyApp, Backbone, Marionette, $, _){
 			});
 		},
 
-		getInfo: function(countingSite) {
+		showHeader: function(domain) {
+			var headerItemView = new HeaderItemView({model: domain});
+			Main.root.showChildView('header', headerItemView);
+		},
+
+		showLogos: function(domain) {
+			Main.root.addRegion("mainHeaderLeft", "#mainHeaderLeft");
+
+			var logos = domain.get('logos');
+
+			if (!logos) {
+				logos = ['./logo/3.jpg'];
+			}
+
+			var logoArray = [];
+				
+			for (var i=0; i<logos.length; i++) {
+				logoArray.push({logo: logos[i]});
+			}
+
+			var logoCollection = new LogoCollection(logoArray);
+
+			var logosCollectionView = new LogosCollectionView({collection: logoCollection});
+
+			Main.root.showChildView('mainHeaderLeft', logosCollectionView);	
+		},
+
+		getInfo: function(countingSites) { // Requests are done one after the other
+
+			console.log(countingSites);
 
 			var counterArray = [];
 
-			var i = 0;
-
 			var self = this;
 
-			countingSite.forEach(function(id) {
+			this.getInfoHelper(countingSites, counterArray, self);
+		},
 
-				var url = "https://api.eco-counter-tools.com/v1/" + "h7q239dd" + "/counting_site/" + id;
+		getInfoHelper: function(countingSites, counterArray, self) {
+			countingSite = countingSites.shift();
 
-				var counter = new Counter();
+			if (countingSite) {
+				var url = "https://api.eco-counter-tools.com/v1/" + "h7q239dd" + "/counting_site/" + countingSite.id;
+
+				var counter = new Counter({displayedName: countingSite.name});
 
 				counter.url = url;
 
 				counter.fetch({
 					success: function() {
 						counterArray.push(counter.toJSON());
-
-						i += 1;
-
-						if (i == countingSite.length) {
-							var counters = new CounterList(counterArray);
-							self.showBackground(counters);
-						}
+						self.getInfoHelper(countingSites, counterArray, self);
 					}
 				});
-			});
+			}else{
+				var counters = new CounterList(counterArray);
+				self.showBackground(counters);
+			}
 		},
 
 		showBackground: function(counters) {

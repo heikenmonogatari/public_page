@@ -41,7 +41,13 @@ var Background = Backbone.Marionette.ItemView.extend({
 
 			bounds.extend(marker.position);
 
-			var htmlContent = "<div class='name'>" + counter.get('name') + "</div>";
+			var name = counter.get('name');
+
+			if (counter.get('displayedName')) {
+				name = counter.get('displayedName');
+			}
+
+			var htmlContent = "<div class='name'>" + name + "</div>";
 			htmlContent += "<div class='photo'><img class='photo' src='" + counter.get('photo')[0] + "'/</div>";
 
 			var infoWindow = new google.maps.InfoWindow({
