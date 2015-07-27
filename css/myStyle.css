@@ -98,3 +98,7 @@ body {
   max-height: 400px !important;
 }
 
+#bike_toggle {
+	z-index: 99;
+}
+

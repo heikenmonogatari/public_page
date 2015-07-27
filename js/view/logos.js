@@ -16,7 +16,7 @@ var LogosCollectionView = Backbone.Marionette.CollectionView.extend({
 
 	id: "slides",
 
-	/*onShow: function() {
+	onShow: function() {
 		if ($('#slides img').length > 1) {
 			$('#slides').slidesjs({
 				navigation: {
@@ -35,5 +35,5 @@ var LogosCollectionView = Backbone.Marionette.CollectionView.extend({
 			$('#slides').show();
 		}
 
-	}*/
+	}
 });
