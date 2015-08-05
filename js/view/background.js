@@ -29,8 +29,166 @@ var Background = Backbone.Marionette.ItemView.extend({
 		/*var image = 'image/vide__pt.png';*/
 		var selectedMarker = null;
 		var openedWindow = [];
+		var boxArray = [];
+		var index = 0;
 
-		this.collection.forEach(function(counter) {
+		var self = this;
+
+		var clonedCollection = new Backbone.Collection(this.collection.toJSON());
+
+		this.setMarkersHelper(clonedCollection.toJSON(), bounds, selectedMarker, openedWindow, boxArray, index, self);
+	},
+
+	setMarkersHelper: function(clonedCollection, bounds, selectedMarker, openedWindow, boxArray, index, self) {
+
+		var counter = clonedCollection.shift();
+
+		if (counter) {
+
+			console.log(counter);
+
+			var dataCollection = new DataCollection();
+			dataCollection.url = "https://api.eco-counter-tools.com/v1/" + "h7q239dd" + "/data/periode/" 
+								+ counter.id
+								+ '?begin=' + moment().subtract(1, 'M').format('YYYYMMDD')
+								+ '&end=' + moment().subtract(1, 'd').format('YYYYMMDD')
+								+ '&step=' + 4;
+
+			console.log(moment().subtract(1, 'M').format('YYYYMMDD'));
+			console.log(moment().subtract(1, 'd').format('YYYYMMDD'));
+
+			dataCollection.fetch({
+				success: function() {
+
+					if (counter.userTypeHard == 7) {
+						var image = 'image/vide__pt.png';
+					}else if(counter.userTypeHard == 1) {
+						var image = 'image/pieton__pt.png';
+					}else if(counter.userTypeHard == 2) {
+						var image = 'image/velo__pt.png';
+					}else if(counter.userTypeHard == 12) {
+						var image = 'image/pieton_velo_2_pt.png';
+					}
+
+					var latLng = new google.maps.LatLng(counter.latitude, counter.longitude);
+					var marker = new google.maps.Marker({
+						position: latLng,
+						map: map,
+						icon: image
+					});
+
+					bounds.extend(marker.position);
+
+					var name = counter.name;
+
+					// If displayedName attribute is filled, use it, otherwise use default name
+					if (counter.displayedName) {
+						name = counter.displayedName;
+					}
+
+					var averageTotal = 0;
+					var averageLength =0;
+					dataCollection.forEach(function(datum) {
+						if (datum.get('comptage')) {
+							averageTotal += datum.get('comptage');
+							averageLength++;
+						}
+					});
+
+					var average = (averageTotal/averageLength).toFixed();
+
+					var yesterday = moment().subtract(1, 'd').startOf('d').format('YYYY-MM-DD HH:mm');
+
+					var datum = dataCollection.find(function(datum) {
+						return moment(datum.get('date')).format('YYYY-MM-DD HH:mm') == yesterday;
+					});
+
+					console.log(yesterday);
+
+					if (datum) {
+						var yesterdayCount = datum.get('comptage');
+					}
+
+					boxArray[index] = document.createElement('div');
+					boxArray[index].class = 'infobox';
+					var boxText = "<div class='name'>" + name + "</div>";
+					boxText += "<div class='average'>Daily average: " + average + "</div>";
+					boxText += "<div class='yesterday'>Yesterday: " + yesterdayCount + "</div>";
+
+					console.log(boxArray[index].innerHTML);
+
+					infobox = new InfoBox({
+				        disableAutoPan: false,
+				        maxWidth: 150,
+				        pixelOffset: new google.maps.Size(-140, -110),
+				        zIndex: null,
+				        boxStyle: {
+				           opacity: 1,
+				           width: "280px"
+				        },
+				        closeBoxMargin: "12px 4px 2px 2px",
+				        closeBoxURL: "http://www.google.com/intl/en_us/mapfiles/close.gif",
+				        infoBoxClearance: new google.maps.Size(1, 1)
+				    });
+
+				    index++;
+
+					/*var htmlContent = "<div class='markerBox'><div class='name'>" + name + "</div>";
+						htmlContent += "<div class='average'>Daily average: " + average + "</div>";
+						htmlContent += "<div class='yesterday'>Yesterday: " + yesterdayCount + "</div></div>";*/
+
+					/*var infoWindow = new google.maps.InfoWindow({
+						content: htmlContent
+					});*/
+
+					// Mouseover will open marker
+
+					google.maps.event.addListener(marker, 'mouseover', function(content) {
+						return function() {
+							infobox.setContent(content);
+							infobox.open(map, marker);
+						}
+					}(boxText));
+
+					// Mouseout will close marker. Will keep the currently selected marker open
+					google.maps.event.addListener(marker, 'mouseout', function() {
+						infobox.close(map, marker);
+						
+						if (selectedMarker == this) {
+							infobox.open(map,this);
+						}
+					});
+
+					// Clicking will close the currently selected marker's window and open the clicked marker's window
+					google.maps.event.addListener(marker, 'click', function() {
+						var window = openedWindow.pop();
+
+						if (window) {
+							window.close();
+						}
+
+						selectedMarker = marker;
+						infobox.open(map, marker);
+
+						openedWindow.push(infobox);
+
+						MyApp.trigger("markerClick", [map, counter]);
+					});
+
+					// Closing the marker will unselect the current marker
+					google.maps.event.addListener(infobox,'closeclick',function(){
+					   	selectedMarker = null;
+					});
+
+					self.setMarkersHelper(clonedCollection, bounds, selectedMarker, openedWindow, boxArray, index, self);
+				}
+			});						
+		}else{
+			map.fitBounds(bounds);
+			console.log(boxArray);
+		}
+
+		/*this.collection.forEach(function(counter) {
 
 			if (counter.get('userTypeHard') == 7) {
 				var image = 'image/vide__pt.png';
@@ -53,6 +211,7 @@ var Background = Backbone.Marionette.ItemView.extend({
 
 			var name = counter.get('name');
 
+			// If displayedName attribute is filled, use it, otherwise use default name
 			if (counter.get('displayedName')) {
 				name = counter.get('displayedName');
 			}
@@ -64,10 +223,19 @@ var Background = Backbone.Marionette.ItemView.extend({
 				content: htmlContent
 			});
 
+			var dataCollection = new DataCollection();
+			dataCollection.url = "https://api.eco-counter-tools.com/v1/" + "h7q239dd" + "/data/periode/" 
+							+ counter.get('id')
+							+ '?begin=' + moment().subtract(1, 'M').format('YYYYMMDD')
+							+ '&end=' + moment().subtract(1, 'd').format('YYYYMMDD')
+							+ '&step=' + 4;
+
+			// Mouseover will open marker
 			google.maps.event.addListener(marker, 'mouseover', function() {
 				infoWindow.open(map, marker);
 			});
 
+			// Mouseout will close marker. Will keep the currently selected marker open
 			google.maps.event.addListener(marker, 'mouseout', function() {
 				infoWindow.close(map, marker);
 				
@@ -76,6 +244,7 @@ var Background = Backbone.Marionette.ItemView.extend({
 				}
 			});
 
+			// Clicking will close the currently selected marker's window and open the clicked marker's window
 			google.maps.event.addListener(marker, 'click', function() {
 
 				var window = openedWindow.pop();
@@ -91,13 +260,14 @@ var Background = Backbone.Marionette.ItemView.extend({
 				openedWindow.push(infoWindow);
 			});
 
+			// Closing the marker will unselect the current marker
 			google.maps.event.addListener(infoWindow,'closeclick',function(){
 			   	selectedMarker = null;
 			});
 		});
 
 		map.fitBounds(bounds);
-
+*/
 	},
 
 	onShow: function() {
@@ -140,12 +310,15 @@ var Background = Backbone.Marionette.ItemView.extend({
 		  	});
 		}
 
+		// Add a bicycle path layer
 		var bikeLayer = new google.maps.BicyclingLayer();
 		bikeLayer.setMap(this.map);
 
+		// Button will toggle bike layer on and off
 		var bikeLaneControlDiv = document.createElement('button');
 		var bikeLaneControl = new BikeLaneControl(bikeLaneControlDiv, this.map, bikeLayer);
 
+		// Change position of button to TOP_LEFT, LEFT_TOP, TOP, TOP_RIGHT, RIGHT_TOP, etc...
 		this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(bikeLaneControlDiv);
 
 

@@ -5,7 +5,8 @@ MyApp.module('Layout', function (Layout, MyApp, Backbone) {
         regions: {
             mapCanvas: "#map-canvas",
             chartArea: "#chart-area",
-            header: "#header"
+            header: "#header",
+            summaryHeader: "#sumHeader"
         }
     });
 });

@@ -110,25 +110,25 @@ var InfoboxItemView = Backbone.Marionette.ItemView.extend({
 	onShow: function() {
 		var photos = this.model.get('photo');
 
-		$('#chart-area').children(":first").append('<div id="myCarousel" class="carousel slide" data-ride="carousel">')
+		$('#chart-area').children(":first").append('<div id="myCarousel" class="carousel slide" data-ride="carousel">');
 
-		$('#myCarousel').append('<ol class="carousel-indicators">');
+		$('#myCarousel').append('<ol class="carousel-indicators photo">');
 
 		for (var i=0; i<photos.length; i++) {
 			if (i == 0) {
-				$('.carousel-indicators').append('<li data-target="#myCarousel" data-slide-to="'+ i + '" class="active"></li>');	
+				$('.carousel-indicators.photo').append('<li data-target="#myCarousel" data-slide-to="'+ i + '" class="active"></li>');	
 			}else{
-				$('.carousel-indicators').append('<li data-target="#myCarousel" data-slide-to="'+ i + '" class=""></li>');
+				$('.carousel-indicators.photo').append('<li data-target="#myCarousel" data-slide-to="'+ i + '" class=""></li>');
 			}
 		}
 
-		$('#myCarousel').append('<div class="carousel-inner" role="listbox"></div>');
+		$('#myCarousel').append('<div class="carousel-inner photo-inner" role="listbox"></div>');
 
 		for (var i=0; i<photos.length; i++) {
 			if (i == 0) {
-				$('.carousel-inner').append('<div class="item photoCarouselImg active" id="item' + i + '"></div>');
+				$('.photo-inner').append('<div class="item photoCarouselImg active" id="item' + i + '"></div>');
 			}else{
-				$('.carousel-inner').append('<div class="item photoCarouselImg" id="item' + i + '"></div>');
+				$('.photo-inner').append('<div class="item photoCarouselImg" id="item' + i + '"></div>');
 			}
 			$('#item' + i).append('<center><img class="photoCarousel photoCarouselImg" src="' + photos[i] + '" style="height:250px;"></center>');
 		}

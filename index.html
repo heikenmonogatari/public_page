@@ -9,6 +9,7 @@
 <body>
 	<div class="container-fluid">
 		<div id="header"></div>
+		<div id="sumHeader"></div>
 		<div id="map-canvas"></div>
 		<div id="chart-area" class="col-lg-3 col-md-3 col-xs-12 col-sm-12"></div>
 	</div>
@@ -17,24 +18,27 @@
 
 	<script type="text/template" id="infobox_template">
 		<button class="close" type="button"><img src="image/close.png"></button>
-		<div class="infoTitle"><center>
+		<div class="infoTitle text-center">
 			<% if (!displayedName) { %>
 				<%- name %>
 			<% }else{ %>
 				<%- displayedName %>
 			<% } %>
-		</center></div>
+		</div>
         <div class="chart_container"></div>
 	</script>
 
 	<script type="text/template" id="header_template">
 		<div id="mainHeaderLeft"></div>
-		<div id="mainHeaderCenter"><div id="title"><center><%- displayedName %></center></div></div>
+		<div id="mainHeaderCenter"><div id="title" style="color:<%-color %>;" class="text-center text-uppercase"><center><%- name %></center></div></div>
 		<div id="mainHeaderRight"></div>
 	</script>
 
 	<script type="text/template" id="logo_template">
+	</script>
 
+	<script type="text/template" id="summary_template">
+		<div>Total: <%- total %><br>Average: <%- average %></div>
 	</script>
 
 	<!-- Libraries -->
@@ -45,14 +49,12 @@
     <script src="libraries/jquery-ui.js"></script>
 	<script src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.3/moment.min.js"></script>
 	<script src="libraries/Highstock-2.1.6/js/highstock.js"></script>
+	<script src="libraries/Highstock-2.1.6/js/modules/exporting.js"></script>
+    <script src="libraries/export-csv-master/export-csv.js"></script>
 	<script src="libraries/jquery-ui-1.11.4.custom/jquery-ui.js"></script>
 	<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
-	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
-	<script src="http://matchingnotes.com/javascripts/leaflet-google.js"></script>
+ 	<script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/src/infobox.js"></script>
 	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-	<script src="libraries/Slides-SlidesJS-3/source/jquery.slides.min.js"></script>
-	<script src="libraries/basic-jquery-slider-master/js/bjqs-1.3.min.js"></script>
 
 	<!-- App -->
 	<script src="js/app.js"></script>
@@ -75,5 +77,6 @@
 	<script src="js/view/infobox.js"></script>
 	<script src="js/view/header.js"></script>
 	<script src="js/view/logos.js"></script>
+	<script src="js/view/summaryHeader.js"></script>
 </body>
 </html>
