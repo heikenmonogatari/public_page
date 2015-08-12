@@ -5,33 +5,78 @@
 	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 	<link rel="stylesheet" href="css/myStyle.css"/>
 	<link rel="stylesheet" href="libraries/basic-jquery-slider-master/bjqs.css"/>
+
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 	<div class="container-fluid">
 		<div id="header"></div>
 		<div id="sumHeader"></div>
-		<div id="map-canvas"></div>
-		<div id="chart-area" class="col-lg-3 col-md-3 col-xs-12 col-sm-12"></div>
+		<div id="map-container" class="col-lg-12 col-md-12 col-sm-12 col-xs-12"></div>
+		<div id="period-container" class="col-lg-5 col-md-5 col-xs-12 col-sm-12"></div>
+		<div id="count-container" class="col-lg-3 col-md-3 col-xs-12 col-sm-12"></div>
+		<div id="yesterday-container" class="col-lg-3 col-md-3 col-xs-12 col-sm-12"></div>
+		<div id="chart-container" class="col-lg-8 col-md-8 col-sm-12 col-xs-12"></div>
 	</div>
 
+	<script type="text/template" id="map_template">
 
+	</script>
 
 	<script type="text/template" id="infobox_template">
-		<button class="close" type="button"><img src="image/close.png"></button>
-		<div class="infoTitle text-center">
-			<% if (!displayedName) { %>
-				<%- name %>
-			<% }else{ %>
-				<%- displayedName %>
-			<% } %>
-		</div>
-        <div class="chart_container"></div>
+		<div id="period-area" class="col-lg-6 col-md-6"><div id="period-col" class="col-lg-12 col-md-12"><%- displayedName %></div></div>
+		<div id="count-area" class="col-lg-6 col-md-6"><div id="count-col" class="col-lg-12 col-md-12">Hello</div></div>
+		<div id="yesterday-area" class="col-lg-6 col-md-6"><div id="yesterday-col" class="col-lg-12 col-md-12">Hello</div></div>
+		<div id="chart-area" class="col-lg-12 col-md-12"><div id="chart-col" class="col-lg-12 col-md-12">CHART</div></div>
+	</script>
+
+	<script type="text/template" id="period_template">
+		<div class="form-group">
+            <label for="date_begin"><label data-i18n="period.begin"/>:</label>
+            <div class="input-group date col-lg-11 col-md-11 col-sm-12 col-xs-12">
+                <input type="text" class="dateInput form-control" id="date_begin" value="<%- begin %>"><span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+            </div>
+            <label for="date_end"><label data-i18n="period.end"/>:</label>
+            <div class="input-group date col-lg-11 col-md-11 col-sm-12 col-xs-12">
+                <input type="text" class="dateInput form-control" id="date_end" value="<%- end %>"><span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+            </div>
+        </div>
+
+        <div class="btn-group">
+        	<button type="button" class="btn btn-primary" id="hour_button">Hour</button>
+            <button type="button" class="btn btn-primary" id="day_button">Day</button>
+            <button type="button" class="btn btn-primary" id="week_button">Week</button>
+            <button type="button" class="btn btn-primary" id="month_button">Month</button>
+        </div>
+
+        <div class="btn-group">
+        	<button type="button" class="btn btn-default" id="download_button">Download CSV</button>
+        </div>
+	</script>
+
+	<script type="text/template" id="count_template">
+		<div class="label"><span data-i18n="count.beforeDate"/> <%- begin %> <span data-i18n="count.betweenDate"/> <%- end %>:</div>
+		<div id="totalCount" class="text-center pagination-centered"><% if (typeof count !== 'undefined') {%><%- count %><% }else{ '0' }%></div>
+	</script>
+
+	<script type="text/template" id="yesterday_template">
+		<div class="label"><span data-i18n="yesterday"/></div> 
+		<div id="yesterdayCount" class="text-center pagination-centered"><% if (typeof yesterday !== 'undefined') {%><%- yesterday %><% }else{ '0' }%></div>
+	</script>
+
+	<script type="text/template" id="chart_template">
+
 	</script>
 
 	<script type="text/template" id="header_template">
-		<div id="mainHeaderLeft"></div>
-		<div id="mainHeaderCenter"><div id="title" style="color:<%-color %>;" class="text-center text-uppercase"><center><%- name %></center></div></div>
-		<div id="mainHeaderRight"></div>
+		<div id="mainHeaderLeft" class="col-lg-3 col-md-3 col-sm-3 col-xs-3"><div id="logo-area" class="col-lg-12 col-md-12 col-sm-12 col-xs-12"></div></div>
+		<div id="mainHeaderCenter" class="col-lg-6 col-md-6 col-sm-6 col-xs-6"><div id="text-area" class="col-lg-12 col-md-12 col-sm-12 col-xs-12"><div id="title" style="color:<%-color %>;" class="text-center text-uppercase">
+			<center><%- name %></center></div><div id="slogan"><center>
+				<% if (typeof slogan !== 'undefined') { %>
+					<%- slogan %>
+				<% }%>
+			</center></div></div></div>
+		<div id="mainHeaderRight" class="col-lg-3 col-md-3 col-sm-3 col-xs-3"><div id="language-area" class="col-lg-12 col-md-12 col-sm-12 col-xs-12"></div></div>
 	</script>
 
 	<script type="text/template" id="logo_template">
@@ -39,6 +84,17 @@
 
 	<script type="text/template" id="summary_template">
 		<div>Total: <%- total %><br>Average: <%- average %></div>
+	</script>
+
+	<script type="text/template" id="lang_template">
+		<div class="form-group">
+            <div class="input-group">
+                <select class="form-control select_lang" id="lang_selector">
+                    <option value="1">English</option>
+                    <option value="2">Français</option>
+                </select>
+            </div>
+        </div>
 	</script>
 
 	<!-- Libraries -->
@@ -55,6 +111,8 @@
 	<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
  	<script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/src/infobox.js"></script>
 	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+	<script src="libraries/bootstrap-datepicker-master/js/bootstrap-datepicker.js"></script>
+	<script src="libraries/i18next-1.10.1/i18next-1.10.1.js"></script>
 
 	<!-- App -->
 	<script src="js/app.js"></script>
@@ -74,9 +132,12 @@
 
 	<!-- Views -->
 	<script src="js/view/background.js"></script>
-	<script src="js/view/infobox.js"></script>
 	<script src="js/view/header.js"></script>
 	<script src="js/view/logos.js"></script>
-	<script src="js/view/summaryHeader.js"></script>
+	<script src="js/view/period.js"></script>
+	<script src="js/view/count.js"></script>
+	<script src="js/view/yesterday.js"></script>
+	<script src="js/view/chart.js"></script>
+	<script src="js/view/lang.js"></script>
 </body>
 </html>

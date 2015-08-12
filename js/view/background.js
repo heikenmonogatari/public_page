@@ -1,14 +1,18 @@
+var selectedMarker = null;
+
 var Background = Backbone.Marionette.ItemView.extend({
 
-	initialize: function() {
-		this.mapOptions = {
-		
-		}	
-	},
+	template: "#map_template",
 
-	render: function() {
+	tagName: "div",
 
-		map = new google.maps.Map(document.getElementById("map-canvas"), this.mapOptions);
+	id: "map-canvas",
+
+	className: "col-lg-12 col-md-12 col-sm-12 col-xs-12",
+
+	onRender: function() {
+
+		map = new google.maps.Map(this.el, this.mapOptions);
 		this.map = map;
 
 		this.setMarkers(map);
@@ -27,7 +31,6 @@ var Background = Backbone.Marionette.ItemView.extend({
 	setMarkers: function(map) {
 		var bounds = new google.maps.LatLngBounds();
 		/*var image = 'image/vide__pt.png';*/
-		var selectedMarker = null;
 		var openedWindow = [];
 		var boxArray = [];
 		var index = 0;
@@ -36,41 +39,42 @@ var Background = Backbone.Marionette.ItemView.extend({
 
 		var clonedCollection = new Backbone.Collection(this.collection.toJSON());
 
-		this.setMarkersHelper(clonedCollection.toJSON(), bounds, selectedMarker, openedWindow, boxArray, index, self);
+		this.setMarkersHelper(bounds, openedWindow, boxArray, index, self);
 	},
 
-	setMarkersHelper: function(clonedCollection, bounds, selectedMarker, openedWindow, boxArray, index, self) {
+	setMarkersHelper: function(bounds, openedWindow, boxArray, index, self) {
 
-		var counter = clonedCollection.shift();
+		var counter = self.collection.at(index);
 
 		if (counter) {
 
-			console.log(counter);
-
 			var dataCollection = new DataCollection();
 			dataCollection.url = "https://api.eco-counter-tools.com/v1/" + "h7q239dd" + "/data/periode/" 
-								+ counter.id
+								+ counter.get('id')
 								+ '?begin=' + moment().subtract(1, 'M').format('YYYYMMDD')
 								+ '&end=' + moment().subtract(1, 'd').format('YYYYMMDD')
 								+ '&step=' + 4;
 
-			console.log(moment().subtract(1, 'M').format('YYYYMMDD'));
-			console.log(moment().subtract(1, 'd').format('YYYYMMDD'));
-
 			dataCollection.fetch({
 				success: function() {
 
-					if (counter.userTypeHard == 7) {
+					counter.set({'data': dataCollection});
+
+					if (counter.get('userTypeHard') == 7) {
 						var image = 'image/vide__pt.png';
-					}else if(counter.userTypeHard == 1) {
+						var type = '';
+					}else if(counter.get('userTypeHard') == 1) {
 						var image = 'image/pieton__pt.png';
-					}else if(counter.userTypeHard == 2) {
+						var type = 'Pedestrian'
+					}else if(counter.get('userTypeHard') == 2) {
 						var image = 'image/velo__pt.png';
-					}else if(counter.userTypeHard == 12) {
+						var type = 'Bicycle';
+					}else if(counter.get('userTypeHard') == 12) {
 						var image = 'image/pieton_velo_2_pt.png';
+						var type = 'Bicycle and Pedestrian';
 					}
 
-					var latLng = new google.maps.LatLng(counter.latitude, counter.longitude);
+					var latLng = new google.maps.LatLng(counter.get('latitude'), counter.get('longitude'));
 					var marker = new google.maps.Marker({
 						position: latLng,
 						map: map,
@@ -79,11 +83,11 @@ var Background = Backbone.Marionette.ItemView.extend({
 
 					bounds.extend(marker.position);
 
-					var name = counter.name;
+					var name = counter.get('name');
 
 					// If displayedName attribute is filled, use it, otherwise use default name
-					if (counter.displayedName) {
-						name = counter.displayedName;
+					if (counter.get('displayedName')) {
+						name = counter.get('displayedName');
 					}
 
 					var averageTotal = 0;
@@ -103,8 +107,6 @@ var Background = Backbone.Marionette.ItemView.extend({
 						return moment(datum.get('date')).format('YYYY-MM-DD HH:mm') == yesterday;
 					});
 
-					console.log(yesterday);
-
 					if (datum) {
 						var yesterdayCount = datum.get('comptage');
 					}
@@ -114,35 +116,25 @@ var Background = Backbone.Marionette.ItemView.extend({
 					var boxText = "<div class='name'>" + name + "</div>";
 					boxText += "<div class='average'>Daily average: " + average + "</div>";
 					boxText += "<div class='yesterday'>Yesterday: " + yesterdayCount + "</div>";
-
-					console.log(boxArray[index].innerHTML);
+					boxText += "<div class='type'>Type: " + type + "</div>";
 
 					infobox = new InfoBox({
 				        disableAutoPan: false,
-				        maxWidth: 150,
-				        pixelOffset: new google.maps.Size(-140, -110),
+				        maxWidth: 50,
+				        pixelOffset: new google.maps.Size(-140, -140),
 				        zIndex: null,
 				        boxStyle: {
 				           opacity: 1,
 				           width: "280px"
 				        },
-				        closeBoxMargin: "12px 4px 2px 2px",
+				        closeBoxMargin: "5px 2px 2px 2px",
 				        closeBoxURL: "http://www.google.com/intl/en_us/mapfiles/close.gif",
 				        infoBoxClearance: new google.maps.Size(1, 1)
 				    });
 
 				    index++;
 
-					/*var htmlContent = "<div class='markerBox'><div class='name'>" + name + "</div>";
-						htmlContent += "<div class='average'>Daily average: " + average + "</div>";
-						htmlContent += "<div class='yesterday'>Yesterday: " + yesterdayCount + "</div></div>";*/
-
-					/*var infoWindow = new google.maps.InfoWindow({
-						content: htmlContent
-					});*/
-
 					// Mouseover will open marker
-
 					google.maps.event.addListener(marker, 'mouseover', function(content) {
 						return function() {
 							infobox.setContent(content);
@@ -153,9 +145,9 @@ var Background = Backbone.Marionette.ItemView.extend({
 					// Mouseout will close marker. Will keep the currently selected marker open
 					google.maps.event.addListener(marker, 'mouseout', function() {
 						infobox.close(map, marker);
-						
-						if (selectedMarker == this) {
-							infobox.open(map,this);
+					
+						if (selectedMarker) {
+							infobox.open(map, selectedMarker);
 						}
 					});
 
@@ -167,10 +159,14 @@ var Background = Backbone.Marionette.ItemView.extend({
 							window.close();
 						}
 
-						selectedMarker = marker;
+						selectedMarker = this;
 						infobox.open(map, marker);
 
 						openedWindow.push(infobox);
+
+						$('#map-container').removeClass().addClass('col-lg-4 col-md-4 col-sm-12 col-xs-12');
+
+						//map.setCenter(marker.getPosition());
 
 						MyApp.trigger("markerClick", [map, counter]);
 					});
@@ -180,12 +176,12 @@ var Background = Backbone.Marionette.ItemView.extend({
 					   	selectedMarker = null;
 					});
 
-					self.setMarkersHelper(clonedCollection, bounds, selectedMarker, openedWindow, boxArray, index, self);
+					self.setMarkersHelper(bounds, openedWindow, boxArray, index, self);
 				}
 			});						
 		}else{
 			map.fitBounds(bounds);
-			console.log(boxArray);
+			console.log(self.collection.toJSON());
 		}
 
 		/*this.collection.forEach(function(counter) {
@@ -275,16 +271,17 @@ var Background = Backbone.Marionette.ItemView.extend({
 
 			controlDiv.style.padding = "0px";
 			controlDiv.style.backgroundColor = "transparent";
-			controlDiv.style.border = '2px solid #fff';
+			//controlDiv.style.border = '2px solid #fff';
 			controlDiv.style.borderRadius = '3px';
-			controlDiv.style.boxShadow = '0 2px 6px rgb(0,0,0)';
+			controlDiv.style.margin = '5px';
+			//controlDiv.style.boxShadow = '0 2px 6px rgb(0,0,0)';
 
 			// Set CSS for the control border
 			var controlUI = document.createElement('div');
 			controlUI.style.backgroundColor = '#fff';
 			controlUI.style.border = '2px solid #fff';
 			controlUI.style.borderRadius = '3px';
-		 	controlUI.style.boxShadow = '0 2px 6px rgb(0,0,0)';
+		 	//controlUI.style.boxShadow = '0 2px 6px rgb(0,0,0)';
 			controlUI.style.cursor = 'pointer';
 			controlUI.style.textAlign = 'center';
 			controlUI.title = 'Click to toggle bike lanes';
@@ -294,11 +291,11 @@ var Background = Backbone.Marionette.ItemView.extend({
 			var controlText = document.createElement('div');
 			controlText.style.color = 'rgb(25,25,25)';
 			controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
-			controlText.style.fontSize = '16px';
-			controlText.style.lineHeight = '38px';
+			controlText.style.fontSize = '10x';
+			controlText.style.lineHeight = '10px';
 			controlText.style.paddingLeft = '5px';
 			controlText.style.paddingRight = '5px';
-			controlText.innerHTML = 'Bike Lanes';
+			controlText.innerHTML = 'Bicycle infrastructure';
 			controlUI.appendChild(controlText);
 
 		 	google.maps.event.addDomListener(controlUI, 'click', function() {
@@ -310,6 +307,43 @@ var Background = Backbone.Marionette.ItemView.extend({
 		  	});
 		}
 
+		function FullMapControl(controlDiv, map) {
+
+			controlDiv.style.padding = "0px";
+			controlDiv.style.backgroundColor = "transparent";
+			//controlDiv.style.border = '2px solid #fff';
+			controlDiv.style.borderRadius = '3px';
+			controlDiv.style.margin = '5px';
+			//controlDiv.style.boxShadow = '0 2px 6px rgb(0,0,0)';
+
+			// Set CSS for the control border
+			var controlUI = document.createElement('div');
+			controlUI.style.backgroundColor = '#fff';
+			controlUI.style.border = '2px solid #fff';
+			controlUI.style.borderRadius = '3px';
+		 	//controlUI.style.boxShadow = '0 2px 6px rgb(0,0,0)';
+			controlUI.style.cursor = 'pointer';
+			controlUI.style.textAlign = 'center';
+			controlUI.title = 'Click to expand map';
+			controlDiv.appendChild(controlUI);
+
+			// Set CSS for the control interior
+			var controlText = document.createElement('div');
+			controlText.style.color = 'rgb(25,25,25)';
+			controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
+			controlText.style.fontSize = '10x';
+			controlText.style.lineHeight = '10px';
+			controlText.style.paddingLeft = '5px';
+			controlText.style.paddingRight = '5px';
+			controlText.innerHTML = 'Expand Map';
+			controlUI.appendChild(controlText);
+
+		 	google.maps.event.addDomListener(controlUI, 'click', function() {
+		  		$('#map-container').removeClass().addClass('col-lg-12 col-md-12 col-sm-12 col-xs-12');
+		  		map.setCenter(selectedMarker.getPosition());
+		  	});
+		}
+
 		// Add a bicycle path layer
 		var bikeLayer = new google.maps.BicyclingLayer();
 		bikeLayer.setMap(this.map);
@@ -318,8 +352,13 @@ var Background = Backbone.Marionette.ItemView.extend({
 		var bikeLaneControlDiv = document.createElement('button');
 		var bikeLaneControl = new BikeLaneControl(bikeLaneControlDiv, this.map, bikeLayer);
 
+		var fullMapDiv = document.createElement('button');
+		var fullMapControl = new FullMapControl(fullMapDiv, this.map);
+
 		// Change position of button to TOP_LEFT, LEFT_TOP, TOP, TOP_RIGHT, RIGHT_TOP, etc...
-		this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(bikeLaneControlDiv);
+		this.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(bikeLaneControlDiv);
+
+		this.map.controls[google.maps.ControlPosition.RIGHT_TOP].push(fullMapDiv);
 
 
 	}

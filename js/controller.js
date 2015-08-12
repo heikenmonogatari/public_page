@@ -1,5 +1,7 @@
 MyApp.module('Main', function (Main, MyApp, Backbone, Marionette, $, _){
 
+	Backbone.globalEvent = _.extend({}, Backbone.Events);
+
 	Main.Router = Marionette.AppRouter.extend({
 		appRoutes: {
 			"domain/:domain": "showPage"
@@ -36,6 +38,7 @@ MyApp.module('Main', function (Main, MyApp, Backbone, Marionette, $, _){
 							self.showHeader(domain);
 							self.showLogos(domain);
 							self.getInfo(domain.get('counting_site'));
+							self.showLang();
 						}
 					});
 				}
@@ -48,7 +51,7 @@ MyApp.module('Main', function (Main, MyApp, Backbone, Marionette, $, _){
 		},
 
 		showLogos: function(domain) {
-			Main.root.addRegion("mainHeaderLeft", "#mainHeaderLeft");
+			Main.root.addRegion("logoArea", "#logo-area");
 
 			var logos = domain.get('logos');
 
@@ -66,7 +69,7 @@ MyApp.module('Main', function (Main, MyApp, Backbone, Marionette, $, _){
 
 			var logosItemView = new LogosItemView({collection: logoCollection});
 
-			Main.root.showChildView('mainHeaderLeft', logosItemView);	
+			Main.root.showChildView('logoArea', logosItemView);	
 		},
 
 		getInfo: function(countingSites) { // Requests are done one after the other
@@ -82,7 +85,7 @@ MyApp.module('Main', function (Main, MyApp, Backbone, Marionette, $, _){
 			countingSite = countingSites.shift();
 
 			if (countingSite) {
-				console.log(countingSite);
+				
 				var url = "https://api.eco-counter-tools.com/v1/" + "h7q239dd" + "/counting_site/" + countingSite.id;
 
 				var counter = new Counter({displayedName: countingSite.displayedName});
@@ -98,13 +101,19 @@ MyApp.module('Main', function (Main, MyApp, Backbone, Marionette, $, _){
 			}else{
 				var counters = new CounterList(counterArray);
 				self.showBackground(counters);
-				self.showSummaryHeader(counters);
+				//self.showSummaryHeader(counters);
 			}
 		},
 
+		showLang: function() {
+			Main.root.addRegion("languageArea", "#language-area");
+			var lang = new LangItemView();
+			Main.root.showChildView('languageArea', lang);
+		},	
+
 		showBackground: function(counters) {
 			var map = new Background({collection: counters});
-			Main.root.showChildView('mapCanvas', map);
+			Main.root.showChildView('mapContainer', map);
 		},
 
 		showSummaryHeader: function(counters) {
@@ -208,10 +217,30 @@ MyApp.module('Main', function (Main, MyApp, Backbone, Marionette, $, _){
 			getData();
 		},
 
-		showInfoBox: function(map, counter) {
-			var infoboxItemView = new InfoboxItemView({model: new Backbone.Model(counter), map: map});
-			Main.root.showChildView('chartArea', infoboxItemView);
-		}
+		showPeriodBox: function(counter) {
+			counter.set({
+				begin: moment().subtract(6, 'M').format('YYYY-MM-DD'),
+				end: moment().subtract(1, 'd').format('YYYY-MM-DD')
+			});
+
+			var periodItemView = new PeriodItemView({model: counter});
+			Main.root.showChildView('periodContainer', periodItemView);
+		},
+
+		showCountBox: function(counter) {
+			var countItemView = new CountItemView({model: counter});
+			Main.root.showChildView('countContainer', countItemView);
+		},
+
+		showYesterdayBox: function(counter) {
+			var yesterdayItemView = new YesterdayItemView({model: counter});
+			Main.root.showChildView('yesterdayContainer', yesterdayItemView);
+		},
+
+		showChartBox: function(counter) {
+			var chartItemView = new ChartItemView({counter: counter});
+			Main.root.showChildView('chartContainer', chartItemView);
+		}		
 	});
 
 	MyApp.on('start', function() {
@@ -220,6 +249,9 @@ MyApp.module('Main', function (Main, MyApp, Backbone, Marionette, $, _){
 	});
 
 	MyApp.on('markerClick', function(options){
-		Main.controller.showInfoBox(options[0], options[1]);
+		Main.controller.showPeriodBox(options[1]);
+		Main.controller.showChartBox(options[1]);
+		Main.controller.showCountBox(options[1]);
+		Main.controller.showYesterdayBox(options[1]);
 	});
 });

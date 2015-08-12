@@ -1,0 +1,12 @@
+{
+	"language": "Langue",
+	"period": {
+		"begin": "Début",
+		"end": "Fin"
+	},
+	"count": {
+		"beforeDate": "Du",
+		"betweenDate": "jusqu'au"
+	},
+	"yesterday": "Hier"
+}

@@ -23,6 +23,7 @@ $(document).ready(function(){
 		$("body").css("cursor", "default")
 	});
 
-    MyApp.start();
-
+	i18n.init({lng: "en-US", debug: true}, function() {
+		MyApp.start();	
+	})
 });

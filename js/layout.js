@@ -3,10 +3,13 @@ MyApp.module('Layout', function (Layout, MyApp, Backbone) {
     Layout.Root = Backbone.Marionette.LayoutView.extend({
         el: 'body',
         regions: {
-            mapCanvas: "#map-canvas",
-            chartArea: "#chart-area",
+            mapContainer: "#map-container",
             header: "#header",
-            summaryHeader: "#sumHeader"
+            summaryHeader: "#sumHeader",
+            periodContainer: "#period-container",
+            countContainer: "#count-container",
+            yesterdayContainer: "#yesterday-container",
+            chartContainer: "#chart-container"
         }
     });
 });

@@ -1,4 +1,14 @@
 var InfoboxItemView = Backbone.Marionette.ItemView.extend({
+	template: "#infobox_template",
+
+	onShow: function() {
+		this.$el.fadeIn();
+	}
+});
+
+
+
+/*var InfoboxItemView = Backbone.Marionette.ItemView.extend({
 
 	template: "#infobox_template",
 
@@ -83,7 +93,7 @@ var InfoboxItemView = Backbone.Marionette.ItemView.extend({
 			        series: [{
 			            data: serialized_data,
 			            pointWidth: 2,
-			            color: "#d4d600"
+			            color: "#D4D600"
 			        }]
 				})
 			}
@@ -143,4 +153,4 @@ var InfoboxItemView = Backbone.Marionette.ItemView.extend({
 			interval: 4000
 		})
 	}
-});
+});*/
