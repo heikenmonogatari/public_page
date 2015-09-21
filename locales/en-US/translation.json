@@ -2,11 +2,16 @@
 	"language": "Language",
 	"period": {
 		"begin": "Begin",
-		"end": "End"
+		"end": "End",
+		"hour": "Hour",
+		"day": "Day",
+		"week": "Week",
+		"month": "Month",
+		"download": "Download CSV"
 	},
 	"count": {
-		"beforeDate": "Count from",
-		"betweenDate": "to"
+		"beforeDate": "From __option__",
+		"betweenDate": "to __option__"
 	},
 	"yesterday": "Yesterday"
 }

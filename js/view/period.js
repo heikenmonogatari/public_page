@@ -65,30 +65,70 @@ PeriodItemView = Backbone.Marionette.ItemView.extend({
 	},
 
 	clickDownload: function() {
-		var data = this.model.get('data').toJSON();
+		try {
+			var data = this.model.get('data').toJSON();
 
-		console.log(data[0]);
+			var CSV = "";
 
-		var CSV = "";
+			CSV += this.model.get('name') + '\r\n\n';
 
-		CSV += this.model.get('name') + '\r\n\n';
+			// labels
+			var keys = _.keys(data[0]);
 
-		var keys = _.keys(data[0]);
+			var row = keys[0] + "," + keys[1];
 
-		var row = keys[0] + "," + keys[1];
+			CSV += row + '\r\n';
 
-		CSV += row + '\r\n';
-
-		for (var i=0; i<data.length; i++) {
-			var row = "";
-			for (var index in data[i]) {
-				if (index != "status" && index != "timestamp") {
-					row += data[i][index] + ',';
+			// data
+			for (var i=0; i<data.length; i++) {
+				var row = "";
+				for (var index in data[i]) {
+					if (index != "status" && index != "timestamp") {
+						row += data[i][index] + ',';
+					}
 				}
-			}
-			row += '\r\n';
+				row += '\r\n';
 
-			CSV += row;
+				CSV += row;
+			}
+		}
+		// if err, than data comes from a counter with multiple channels
+		catch(err) {
+			var data = this.model.get('data');
+			var names = [];
+			var jsonData = [];
+
+			for (var i=0; i<data.length; i++) {
+				jsonData.push(data[i].data.toJSON());
+				names.push(data[i].name);
+			}
+
+			var CSV = "";
+
+			CSV += this.model.get('name') + '\r\n\n';
+
+			// channel names
+			var row = "";
+			for (var i=0; i<names.length; i++) {
+				row += names[i] + ", ,";
+			}
+
+			CSV += row + '\r\n';
+			// data. First For is for number of rows = number entries
+			
+			for (var i=0; i<jsonData[0].length; i++) {
+				var row = "";
+				// Second For is for number of counter;
+				for (var j=0; j<jsonData.length; j++) {
+					// Third For is for number of columns per counter eg. Date, Comptage and exclude status and timestamp
+					for (var index in jsonData[j][i]) {
+						if (index != "status" && index != "timestamp") {
+							row += jsonData[j][i][index] + ',';
+						}
+					}
+				}
+				CSV += row + '\r\n';
+			}			
 		}
 
 		var fileName = "counter_data";
@@ -115,9 +155,16 @@ PeriodItemView = Backbone.Marionette.ItemView.extend({
 
 	onRender: function() {
 		this.$el.i18n();
+
 		$('.input-group.date').datepicker({
 		    format: "yyyy-mm-dd",
-		    autoclose: true
+		    autoclose: true,
+		    orientation: "top auto",
+		    keyboardNavigation: false
 		});
+	},
+
+	onDestroy: function() {
+		Backbone.globalEvent.unbind('changeLang', this.render, this);
 	}
 });

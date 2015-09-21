@@ -43,24 +43,24 @@
         </div>
 
         <div class="btn-group">
-        	<button type="button" class="btn btn-primary" id="hour_button">Hour</button>
-            <button type="button" class="btn btn-primary" id="day_button">Day</button>
-            <button type="button" class="btn btn-primary" id="week_button">Week</button>
-            <button type="button" class="btn btn-primary" id="month_button">Month</button>
+        	<button type="button" class="btn btn-primary" id="hour_button"><span data-i18n="period.hour"/></button>
+            <button type="button" class="btn btn-primary active" id="day_button"><span data-i18n="period.day"/></button>
+            <button type="button" class="btn btn-primary" id="week_button"><span data-i18n="period.week"/></button>
+            <button type="button" class="btn btn-primary" id="month_button"><span data-i18n="period.month"/></button>
         </div>
 
         <div class="btn-group">
-        	<button type="button" class="btn btn-default" id="download_button">Download CSV</button>
+        	<button type="button" class="btn btn-default" id="download_button"><span data-i18n="period.download"/> <i class="glyphicon glyphicon-download-alt"></i></button>
         </div>
 	</script>
 
 	<script type="text/template" id="count_template">
-		<div class="label"><span data-i18n="count.beforeDate"/> <%- begin %> <span data-i18n="count.betweenDate"/> <%- end %>:</div>
+		<div class="label"><%= _t("count.beforeDate", {option: begin}) %> <%= _t("count.betweenDate", {option: end}) %> :</div>
 		<div id="totalCount" class="text-center pagination-centered"><% if (typeof count !== 'undefined') {%><%- count %><% }else{ '0' }%></div>
 	</script>
 
 	<script type="text/template" id="yesterday_template">
-		<div class="label"><span data-i18n="yesterday"/></div> 
+		<div class="label"><span data-i18n="yesterday"/>:</div> 
 		<div id="yesterdayCount" class="text-center pagination-centered"><% if (typeof yesterday !== 'undefined') {%><%- yesterday %><% }else{ '0' }%></div>
 	</script>
 
@@ -92,6 +92,7 @@
                 <select class="form-control select_lang" id="lang_selector">
                     <option value="1">English</option>
                     <option value="2">Français</option>
+                    <option value="3">日本語</option>
                 </select>
             </div>
         </div>
@@ -129,6 +130,7 @@
 	<script src="js/model/counter.js"></script>
 	<script src="js/model/data.js"></script>
 	<script src="js/model/logos.js"></script>
+	<script src="js/model/channel.js"></script>
 
 	<!-- Views -->
 	<script src="js/view/background.js"></script>

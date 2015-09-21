@@ -35,6 +35,10 @@ MyApp.module('Main', function (Main, MyApp, Backbone, Marionette, $, _){
 				success: function() {
 					self.domains.forEach(function(domain) {
 						if (self.domain == domain.get('name')) {
+
+							// Set background image
+							$('body').css('background-image', 'url("./image/background2.jpg")');
+
 							self.showHeader(domain);
 							self.showLogos(domain);
 							self.getInfo(domain.get('counting_site'));
@@ -249,6 +253,10 @@ MyApp.module('Main', function (Main, MyApp, Backbone, Marionette, $, _){
 	});
 
 	MyApp.on('markerClick', function(options){
+		$('#period-container').show();
+		$('#count-container').show();
+		$('#yesterday-container').show();
+		$('#chart-container').show();
 		Main.controller.showPeriodBox(options[1]);
 		Main.controller.showChartBox(options[1]);
 		Main.controller.showCountBox(options[1]);

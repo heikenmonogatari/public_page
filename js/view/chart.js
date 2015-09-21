@@ -8,15 +8,115 @@ ChartItemView = Backbone.Marionette.ItemView.extend({
 	initialize: function(options) {
 
 		this.counter = options.counter;
-		_.bindAll(this, 'getData');
-		Backbone.globalEvent.on('refresh', this.getData);
+		_.bindAll(this, 'checkChannels');
+		Backbone.globalEvent.on('refresh', this.checkChannels);
 	},
 
 	onShow: function() {
-		this.getData(4);
+		//this.getData(4);
+		this.checkChannels(4);
 	},
 
-	getData: function(step) {
+	checkChannels: function(step) {
+		var channels = new ChannelCollection();
+
+		channels.url = "https://api.eco-counter-tools.com/v1/" + "h7q239dd" + "/counting_site/channels/"
+    						+ this.counter.get('id');
+
+    	var self = this;
+
+    	channels.fetch({
+    		success: function() {
+    			if (channels.length > 0) {
+    				self.channelsFetch(channels, step);
+    			}else{
+    				self.channelFetch(step);
+    			}
+    		}
+    	});
+	},
+
+	channelFetch: function(step) {
+	},
+
+	channelsFetch: function(channels, step) {
+		var self = this;
+		this.step = step;
+		var series = [];
+		var count = 0;
+		var yesterdayDate = moment().subtract(1, 'd').startOf('d').format('YYYYMMDD');
+		var yesterday = 0;
+		var csvData = [];
+
+		var colors = ['#D4D600', '#828184', '#24B7D2', '#98C21D']
+
+		var begin = moment($('#date_begin').val()).format('YYYYMMDD');
+		var end = moment($('#date_end').val()).format('YYYYMMDD');
+
+		this.channelsFetchHelper(channels, series, begin, end, colors, count, yesterdayDate, yesterday, csvData, self);
+	},
+
+	channelsFetchHelper: function(channels, series, begin, end, colors, count, yesterdayDate, yesterday, csvData, self) {
+		var channel = channels.shift();
+		var color = colors.shift();
+
+		if (channel) {
+			var dataCollection = new DataCollection();
+
+			dataCollection.url = "https://api.eco-counter-tools.com/v1/" + "h7q239dd" + "/data/periode/" 
+							+ channel.get("id")
+							+ '?begin=' + begin
+							+ '&end=' + end
+							+ '&step=' + self.step;
+
+			dataCollection.fetch({
+				success: function() {
+					var serie = {};
+					var data = [];
+					var csvSerie = {};
+
+					dataCollection.forEach(function(datum) {
+						data.push([moment.utc( datum.get('date'), "YYYY-MM-DD HH:mm:ss" ).unix() * 1000, datum.get('comptage')])
+						count += datum.get('comptage');
+					});
+
+					var yesterdayModel = new Backbone.Model();
+
+					yesterdayModel.url = "https://api.eco-counter-tools.com/v1/" + "h7q239dd" + "/data/periode/" 
+							+ channel.get("id")
+							+ '?begin=' + yesterdayDate
+							+ '&end=' + yesterdayDate
+							+ '&step=' + self.step;
+
+					yesterdayModel.fetch({
+						success: function () {
+							yesterday += yesterdayModel.get('0').comptage;
+
+							serie.name = channel.get('name');
+							serie.data = data;
+							serie.color = color;
+							
+							csvSerie.name = channel.get('name');
+							csvSerie.data = dataCollection;
+						
+							series.push(serie);
+							csvData.push(csvSerie);
+
+							self.channelsFetchHelper(channels, series, begin, end, colors, count, yesterdayDate, yesterday, csvData, self);
+						}
+					});
+
+					
+				}
+			});
+
+		}else{
+			self.makeChart(series);
+			self.counter.set({'count': count, 'yesterday': yesterday, data: csvData});
+		}
+	},
+
+	/*getData: function(step) {
 
 		var step = step;
 
@@ -66,13 +166,13 @@ ChartItemView = Backbone.Marionette.ItemView.extend({
 				self.makeChart(data);
 			}
 		});
-	},
+	},*/
 
-	makeChart: function(data) {
+	makeChart: function(series) {
 
 		$('#chart-col').highcharts('StockChart', {
             chart: {
-                alignTicks: false
+                type: 'column'
             },
 
             xAxis: {
@@ -95,17 +195,26 @@ ChartItemView = Backbone.Marionette.ItemView.extend({
 
             },
 
+            plotOptions: {
+            	column: {
+            		stacking: 'normal',
+            	}
+            },
+
+            legend: {
+            	enabled: true,
+            	aligh: 'right',
+            	layout: 'vertical',
+            	verticalAlign: 'top'
+            },
+
             title: {
                 style: {
                 	display: 'none'
                 }
             },
 
-            series: [{
-            	type: 'column',
-            	name: 'Counts',
-            	data: data
-            }]
+            series: series
         });
 	}
 });

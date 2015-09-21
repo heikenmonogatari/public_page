@@ -1,11 +1,21 @@
 html {
-	overflow: hidden;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+	background-size: cover;
 }
 
 body {
-	background-image: url("../image/background.jpg");
-	background-repeat: no-repeat;
+	background: url("../image/background.jpg") no-repeat center center fixed;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
 	background-size: cover;
+	height: 100%;
+}
+
+#chart-container:empty, #header:empty, #map-container:empty, #period-container:empty, #count-container:empty, #count-container:empty, #yesterday-container:empty {
+	display: none;
 }
 
 #chart-area:empty {
@@ -24,7 +34,7 @@ body {
 	position: relative; 
 	/*top: 165px; */
 	bottom: 0px; 
-	height: 85%;
+	height: 844.047px;
 	padding: 15px;
 	-webkit-transition: width 0.3s ease, margin 0.3s ease;
     -moz-transition: width 0.3s ease, margin 0.3s ease;
@@ -41,7 +51,7 @@ body {
 }
 
 #period-container {
-	height: 30%;
+	height: 297.891px;
 	padding: 15px;
 }
 
@@ -51,7 +61,7 @@ body {
 }
 
 #count-container {
-	height: 15%;
+	height: 148.938px;
 	padding: 15px;
 }
 
@@ -61,7 +71,7 @@ body {
 }
 
 #yesterday-container {
-	height: 15%;
+	height: 148.938px;
 	padding: 15px;
 }
 
@@ -71,7 +81,7 @@ body {
 }
 
 #chart-container {
-	height: 55%;
+	height: 546.141px;
 	padding: 15px;
 }
 
@@ -89,7 +99,7 @@ body {
 .header {
 	padding-top: 15px;
 	z-index: 5;
-	height: 15%;
+	height: 148.938px;
 	left: 0;
 	right: 0;
 	width: 100%;
@@ -201,4 +211,19 @@ body {
 
 .label {
 	color: #87888a;
+}
+
+#map-expand {
+	z-index: 1;
+	position: absolute;
+	top: 50%;
+	right: 0px;
+	transform: translate(0%, -50%)
+}
+
+#lang-container {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%)
 }

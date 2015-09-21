@@ -2,6 +2,11 @@
 	"language": "Language",
 	"period": {
 		"begin": "Begin",
-		"end": "End"
+		"end": "End",
+		"hour": "Hour",
+		"day": "Day",
+		"week": "Week",
+		"month": "Month",
+		"download": "Download CSV"
 	}
 }

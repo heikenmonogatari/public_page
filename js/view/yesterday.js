@@ -16,5 +16,9 @@ YesterdayItemView = Backbone.Marionette.ItemView.extend({
 
 	onRender: function() {
 		this.$el.i18n();
+	},
+
+	onDestroy: function() {
+		Backbone.globalEvent.unbind('changeLang', this.render, this);
 	}
 });

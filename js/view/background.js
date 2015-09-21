@@ -70,7 +70,7 @@ var Background = Backbone.Marionette.ItemView.extend({
 						var image = 'image/velo__pt.png';
 						var type = 'Bicycle';
 					}else if(counter.get('userTypeHard') == 12) {
-						var image = 'image/pieton_velo_2_pt.png';
+						var image = 'image/pieton_velo.png';
 						var type = 'Bicycle and Pedestrian';
 					}
 
@@ -119,7 +119,7 @@ var Background = Backbone.Marionette.ItemView.extend({
 					boxText += "<div class='type'>Type: " + type + "</div>";
 
 					infobox = new InfoBox({
-				        disableAutoPan: false,
+				        disableAutoPan: true,
 				        maxWidth: 50,
 				        pixelOffset: new google.maps.Size(-140, -140),
 				        zIndex: null,
@@ -307,7 +307,7 @@ var Background = Backbone.Marionette.ItemView.extend({
 		  	});
 		}
 
-		function FullMapControl(controlDiv, map) {
+		/*function FullMapControl(controlDiv, map) {
 
 			controlDiv.style.padding = "0px";
 			controlDiv.style.backgroundColor = "transparent";
@@ -342,7 +342,7 @@ var Background = Backbone.Marionette.ItemView.extend({
 		  		$('#map-container').removeClass().addClass('col-lg-12 col-md-12 col-sm-12 col-xs-12');
 		  		map.setCenter(selectedMarker.getPosition());
 		  	});
-		}
+		}*/
 
 		// Add a bicycle path layer
 		var bikeLayer = new google.maps.BicyclingLayer();
@@ -352,14 +352,33 @@ var Background = Backbone.Marionette.ItemView.extend({
 		var bikeLaneControlDiv = document.createElement('button');
 		var bikeLaneControl = new BikeLaneControl(bikeLaneControlDiv, this.map, bikeLayer);
 
-		var fullMapDiv = document.createElement('button');
-		var fullMapControl = new FullMapControl(fullMapDiv, this.map);
+		/*var fullMapDiv = document.createElement('button');
+		var fullMapControl = new FullMapControl(fullMapDiv, this.map);*/
 
 		// Change position of button to TOP_LEFT, LEFT_TOP, TOP, TOP_RIGHT, RIGHT_TOP, etc...
 		this.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(bikeLaneControlDiv);
 
-		this.map.controls[google.maps.ControlPosition.RIGHT_TOP].push(fullMapDiv);
+		//this.map.controls[google.maps.ControlPosition.RIGHT_TOP].push(fullMapDiv);
 
+		$('#map-container').append('<button type="button" class="btn btn-default" id="map-expand"><i class="glyphicon glyphicon-resize-horizontal"></i></button>');
 
+		var expanded = false;
+		$('#map-expand').click(function() {
+			if (!expanded) {
+				$('#map-container').removeClass().addClass('col-lg-12 col-md-12 col-sm-12 col-xs-12');
+				$('#period-container').hide();
+				$('#count-container').hide();
+				$('#yesterday-container').hide();
+				$('#chart-container').hide();
+				expanded = true;
+			}else{
+				$('#map-container').removeClass().addClass('col-lg-4 col-md-4 col-sm-12 col-xs-12');
+				$('#period-container').show();
+				$('#count-container').show();
+				$('#yesterday-container').show();
+				$('#chart-container').show();
+				expanded = false;
+			}
+		});
 	}
 })

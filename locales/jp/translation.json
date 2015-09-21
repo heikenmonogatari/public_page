@@ -1,0 +1,17 @@
+{
+	"language": "言語",
+	"period": {
+		"begin": "開始日",
+		"end": "最終日",
+		"hour": "時",
+		"day": "日",
+		"week": "週",
+		"month": "月",
+		"download": "ダウンロード CSV"
+	},
+	"count": {
+		"beforeDate": "__option__ から",
+		"betweenDate": "__option__ まで"
+	},
+	"yesterday": "昨日"
+}

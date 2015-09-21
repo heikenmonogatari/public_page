@@ -1,6 +1,10 @@
 LangItemView = Backbone.Marionette.ItemView.extend({
 	template: "#lang_template",
 
+	tagName: "div",
+
+	id: "lang-container",
+
 	events: {
 		"change #lang_selector" : "changeLang"
 	},
@@ -15,6 +19,9 @@ LangItemView = Backbone.Marionette.ItemView.extend({
 				break;
 			case "2":
 				langCode = "fr";
+				break;
+			case "3":
+				langCode = "jp";
 				break;
 		}
 

@@ -2,11 +2,16 @@
 	"language": "Langue",
 	"period": {
 		"begin": "Début",
-		"end": "Fin"
+		"end": "Fin",
+		"hour": "Heure",
+		"day": "Jour",
+		"week": "Semaine",
+		"month": "Mois",
+		"download": "Télécharger CSV"
 	},
 	"count": {
-		"beforeDate": "Du",
-		"betweenDate": "jusqu'au"
+		"beforeDate": "Du __option__",
+		"betweenDate": "jusqu'au __option__"
 	},
 	"yesterday": "Hier"
 }
